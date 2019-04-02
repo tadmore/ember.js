@@ -1,5 +1,4 @@
 import { setComponentManager, capabilities } from '@ember/-internals/glimmer';
-import { get, set } from '@ember/-internals/metal';
 import { setOwner } from '@ember/-internals/owner';
 
 class GlimmerishComponentManager {
@@ -12,9 +11,7 @@ class GlimmerishComponentManager {
     return new Factory(this.owner, args.named);
   }
 
-  updateComponent(component, args) {
-    set(component, 'args', args.named);
-  }
+  updateComponent() {}
 
   getContext(component) {
     return component;
@@ -25,14 +22,6 @@ class GlimmerishComponent {
   constructor(owner, args) {
     setOwner(this, owner);
     this.args = args;
-  }
-
-  get args() {
-    return get(this, '__args__');
-  }
-
-  set args(args) {
-    set(this, '__args__', args);
   }
 }
 
