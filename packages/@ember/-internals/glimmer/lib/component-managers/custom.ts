@@ -45,6 +45,7 @@ const CAPABILITIES = {
 export interface OptionalCapabilities {
   asyncLifecycleCallbacks?: boolean;
   destructor?: boolean;
+  updateHook?: boolean;
 }
 
 export function capabilities(managerAPI: '3.4', options: OptionalCapabilities = {}): Capabilities {
@@ -53,6 +54,7 @@ export function capabilities(managerAPI: '3.4', options: OptionalCapabilities = 
   return {
     asyncLifeCycleCallbacks: Boolean(options.asyncLifecycleCallbacks),
     destructor: Boolean(options.destructor),
+    updateHook: 'updateHook' in options ? Boolean(options.updateHook) : true,
   };
 }
 
@@ -66,6 +68,7 @@ export interface DefinitionState<ComponentInstance> {
 export interface Capabilities {
   asyncLifeCycleCallbacks: boolean;
   destructor: boolean;
+  updateHook: boolean;
 }
 
 // TODO: export ICapturedArgumentsValue from glimmer and replace this
@@ -137,12 +140,12 @@ export interface ComponentArguments {
 export default class CustomComponentManager<ComponentInstance>
   extends AbstractComponentManager<
     CustomComponentState<ComponentInstance>,
-    DefinitionState<ComponentInstance>
+    CustomComponentDefinitionState<ComponentInstance>
   >
   implements
     WithStaticLayout<
       CustomComponentState<ComponentInstance>,
-      DefinitionState<ComponentInstance>,
+      CustomComponentDefinitionState<ComponentInstance>,
       OwnedTemplateMeta,
       RuntimeResolver
     > {
@@ -265,8 +268,12 @@ export default class CustomComponentManager<ComponentInstance>
     }
   }
 
-  getCapabilities(): ComponentCapabilities {
-    return CAPABILITIES;
+  getCapabilities({
+    delegate,
+  }: CustomComponentDefinitionState<ComponentInstance>): ComponentCapabilities {
+    return Object.assign({}, CAPABILITIES, {
+      updateHook: delegate.capabilities.updateHook,
+    });
   }
 
   getTag({ args }: CustomComponentState<ComponentInstance>): Tag {

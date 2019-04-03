@@ -3,15 +3,13 @@ import { setOwner } from '@ember/-internals/owner';
 
 class GlimmerishComponentManager {
   constructor(owner) {
-    this.capabilities = capabilities('3.4');
+    this.capabilities = capabilities('3.4', { updateHook: false });
     this.owner = owner;
   }
 
   createComponent(Factory, args) {
     return new Factory(this.owner, args.named);
   }
-
-  updateComponent() {}
 
   getContext(component) {
     return component;
